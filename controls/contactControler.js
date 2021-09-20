@@ -10,7 +10,8 @@ const getContact=async (req,res)=>{
   const objecjKey = Object.keys(query)[0];
   const objectValue= Object.values(query)[0];
   const contacts = await Contact.find({ userId: userId }).populate('userId');
-  const findContacts = await Contact.find ({[objecjKey]:[objectValue]})
+// Here we add and populate at same time 
+  const findContacts = await Contact.find ({[objecjKey]:[objectValue]}).populate("userId")
    console.log(objecjKey)
    console.log(findContacts)
     res.json({
@@ -52,7 +53,7 @@ const changeContact=async(req,res)=>{
 
 // Deleting a contact
 const deleteContact=async(req,res)=>{
-  const contactID=req.params.id
+  const contactID = req.params.id
   const removecontact=await Contact.deleteOne({_id:contactID})
   if(Contact){
       res.json({
@@ -70,10 +71,15 @@ const addlogin = async(req,res)=>{
   try {
       const passwordValid = await bcrypt.compare(password, user.password);
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-
-    res.cookie("jwt", token, { httpOnly: true, secure: false });
-
-      res.json({massage:"user match"})
+      if( passwordValid ) {
+        res.cookie("jwt", token, { httpOnly: true, secure: false });
+    
+          res.json({massage:"user match"})
+      }else {
+        res.json({
+          message: "Password doesnt match..."
+        })
+      }
   } catch (error) {
     
 
@@ -83,6 +89,8 @@ const addlogin = async(req,res)=>{
 
 // Register a user
 const passwordValid = /(?!^[0-9]*$)(?!^[a-zA-Z]*$)^([a-zA-Z0-9]{6,50})$/;
+
+
  const addregister = async(req,res)=>{
     const { email, password } = req.body;
     const passwordTest= passwordValid.test(password)

@@ -1,37 +1,24 @@
-const express = require('express');
-const dotenv = require("dotenv");
-const mongoose = require('mongoose');
+const express=require("express")
+const app=express()
+const dotenv=require("dotenv")
+const mongoose=require("mongoose")
+const router=require("./router/ContactRouter")
+const registerRouter=require("./router/ContactRouter")
+const loginRouter=require("./router/ContactRouter")
 const cookieParser = require("cookie-parser");
-const app = express();
-
 
 dotenv.config({
-    path: "./config.env",
-});
-// Our middlewares
-app.use(express.json());
+    path:"./config.env"
+})
+app.use(express.json())
 app.use(cookieParser());
 
-
-// Our routes
-const userRouter = require("./router/UserRouter");
-const contactRouter = require("./router/ContactRouter");
-app.use('/user', userRouter);
-app.use('/contact', contactRouter);
-
-
-mongoose.connect(process.env.DB, {
-    useNewUrlParser: true,
+mongoose.connect(process.env.DB,{useNewUrlParser:true,}).then(()=>{
+    console.log("connected to mongoDB!")
 })
-    .then(() => {
-        console.log("Connected to MongoDB !");
-    });
 
+app.use("/contact",router)
+app.use("/register",registerRouter)
+app.use("/login",loginRouter)
 
-
-
-
-
-app.listen(process.env.PORT, () => {
-    console.log("Listening on port 6000");
-});
+app.listen(process.env.PORT,()=>(console.log("this server listing port:6000")))

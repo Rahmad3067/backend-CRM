@@ -10,15 +10,17 @@ const cookieParser = require("cookie-parser");
 dotenv.config({
     path:"./config.env"
 })
+
+// Middlewares
 app.use(express.json())
 app.use(cookieParser());
-
+// Connect to MongoDB
 mongoose.connect(process.env.DB,{useNewUrlParser:true,}).then(()=>{
     console.log("connected to mongoDB!")
 })
-
+// routes
 app.use("/contact",router)
 app.use("/register",registerRouter)
 app.use("/login",loginRouter)
-
+// Server
 app.listen(process.env.PORT,()=>(console.log("this server listing port:6000")))

@@ -1,9 +1,9 @@
-const Contact= require("../model/contact")
-const User = require("../model/user");
+const Contact= require("../models/contact")
+const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-
+// list of all contact
 const getContact=async (req,res)=>{
   const query = req.query;
   const userId = req.cookies.jwtData.id
@@ -11,28 +11,27 @@ const getContact=async (req,res)=>{
   const objectValue= Object.values(query)[0];
   const contacts = await Contact.find({ userId: userId }).populate('userId');
   const findContacts = await Contact.find ({[objecjKey]:[objectValue]})
-
-
    console.log(objecjKey)
    console.log(findContacts)
-
     res.json({
 		status: "OK",
-		message:"data send",
+		message:"All contact list",
         data: findContacts
 	});
 
 }
 
+// Adding a contact
 const addContact=async (req,res)=>{
     const addContacts =await Contact.create(req.body)
     res.json({
 		status: "OK",
-		message:"data send",
+		message:"contact added",
         data: addContacts
 	});
 
 }
+// changing contacts information
 const changeContact=async(req,res)=>{
 
           const contactID = req.params.id
@@ -51,26 +50,23 @@ const changeContact=async(req,res)=>{
      
 }
 
+// Deleting a contact
 const deleteContact=async(req,res)=>{
   const contactID=req.params.id
   const removecontact=await Contact.deleteOne({_id:contactID})
   if(Contact){
       res.json({
           status:"ok",
-          message:"data update",
+          message:"Contact deleted",
           data: removecontact
       })
   }
 }
 
-
-
-
 // Login
 const addlogin = async(req,res)=>{
   const { email, password } = req.body;
   const user = await User.findOne({ email: email })
-
   try {
       const passwordValid = await bcrypt.compare(password, user.password);
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
@@ -81,12 +77,11 @@ const addlogin = async(req,res)=>{
   } catch (error) {
     
 
-      res.json({ errorMessage: "There is a probleme " })
+      res.json({ errorMessage: "search key not validate" })
   }
 }
 
-
-// Register 
+// Register a user
 const passwordValid = /(?!^[0-9]*$)(?!^[a-zA-Z]*$)^([a-zA-Z0-9]{6,50})$/;
  const addregister = async(req,res)=>{
     const { email, password } = req.body;
@@ -99,25 +94,17 @@ const passwordValid = /(?!^[0-9]*$)(?!^[a-zA-Z]*$)^([a-zA-Z0-9]{6,50})$/;
 	} 
     catch (err) {
 		return res.status(400).json({
-			message: " user created",
+			message: " user been created",
 		});
 	}}
   else {
     res.status(400).json({
-      message: " enter a valid email/password",
+      message: " enter a valid email or password",
     });
   }
  }
 
-
-
-
-
-
-
-
-
-
+// exporting
 module.exports ={
   getContact,
   addContact,
